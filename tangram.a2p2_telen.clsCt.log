@@ -1,0 +1,31 @@
+Read in ad_sc and ad_sp
+WARNING: Your filename has more than two extensions: ['.telen', '.m500', '.log1p', '.leiden', '.deg', '.h5ad'].
+Only considering the two last: ['.deg', '.h5ad'].
+WARNING: Your filename has more than two extensions: ['.telen', '.m500', '.log1p', '.leiden', '.deg', '.h5ad'].
+Only considering the two last: ['.deg', '.h5ad'].
+Get marker
+Run pp_adatas
+INFO:root:1032 training genes are saved in `uns``training_genes` of both single cell and spatial Anndatas.
+INFO:root:14110 overlapped genes are saved in `uns``overlap_genes` of both single cell and spatial Anndatas.
+INFO:root:uniform based density prior is calculated and saved in `obs``uniform_density` of the spatial Anndata.
+INFO:root:rna count based density prior is calculated and saved in `obs``rna_count_based_density` of the spatial Anndata.
+Run tangram mapping
+INFO:root:Allocate tensors for mapping.
+INFO:root:Begin training with 1032 genes and rna_count_based density_prior in cells mode...
+INFO:root:Printing scores every 100 epochs.
+INFO:root:Saving results..
+Save mapping result
+Score: 0.185, KL reg: 0.040
+Score: 0.425, KL reg: 0.005
+Score: 0.454, KL reg: 0.003
+Score: 0.459, KL reg: 0.003
+Score: 0.462, KL reg: 0.003
+Score: 0.463, KL reg: 0.003
+Score: 0.465, KL reg: 0.003
+Score: 0.465, KL reg: 0.002
+Score: 0.466, KL reg: 0.002
+Score: 0.466, KL reg: 0.002
+
+real	12m45.015s
+user	9m56.841s
+sys	3m50.781s
