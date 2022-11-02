@@ -1,2 +1,3 @@
-# Spatial Transcritome Annotation with scRNA-seq data and Download Analysis
-created by chunfu xiao and Xiangshang Li
+# Spatial Transcritome Annotation with scRNA-seq data and Downstream Analysis
+created by Chunfu Xiao and Xiangshang Li
+College of Future Technology, Peking University
