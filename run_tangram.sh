@@ -1,5 +1,5 @@
 ################################################
-#File Name: run.sh
+#File Name: run_tangram.sh
 #Author: rbase    
 #Mail: uplee@pku.edu.cn
 #Created Time: Tue 28 Jun 2022 11:42:33 AM CST
