@@ -1,0 +1,61 @@
+cell_type,microenvironment
+Cajal-Retzius cell,Microenv_Cajal-Retzius_cell
+Endothelial,Microenv_Cajal-Retzius_cell
+Thalamic,Microenv_Cajal-Retzius_cell
+VLMC,Microenv_Cajal-Retzius_cell
+Choroid plexus cell,Microenv_Choroid_plexus_cell
+RG3,Microenv_Choroid_plexus_cell
+Endothelial,Microenv_Endothelial
+Cajal-Retzius cell,Microenv_Endothelial
+Microglia,Microenv_Endothelial
+Thalamic,Microenv_Endothelial
+VLMC,Microenv_Endothelial
+GE progenitors,Microenv_GE_progenitors
+RG2,Microenv_GE_progenitors
+RG3,Microenv_GE_progenitors
+IP,Microenv_IP
+Migrating neurons,Microenv_IP
+RG1,Microenv_IP
+Immature neurons,Microenv_Immature_neurons
+Migrating neurons,Microenv_Immature_neurons
+Int1,Microenv_Int1
+Int2,Microenv_Int1
+Striatal inh1,Microenv_Int1
+Int2,Microenv_Int2
+Int1,Microenv_Int2
+RG3,Microenv_Int2
+Striatal inh2,Microenv_Int2
+Int3,Microenv_Int3
+Thalamic,Microenv_Int3
+Microglia,Microenv_Microglia
+Endothelial,Microenv_Microglia
+Striatal inh2,Microenv_Microglia
+Thalamic,Microenv_Microglia
+Migrating neurons,Microenv_Migrating_neurons
+IP,Microenv_Migrating_neurons
+Immature neurons,Microenv_Migrating_neurons
+VLMC,Microenv_Migrating_neurons
+RG1,Microenv_RG1
+IP,Microenv_RG1
+RG2,Microenv_RG1
+RG2,Microenv_RG2
+GE progenitors,Microenv_RG2
+RG1,Microenv_RG2
+RG3,Microenv_RG3
+Choroid plexus cell,Microenv_RG3
+GE progenitors,Microenv_RG3
+Int2,Microenv_RG3
+Striatal inh1,Microenv_Striatal_inh1
+Int1,Microenv_Striatal_inh1
+Striatal inh2,Microenv_Striatal_inh2
+Int2,Microenv_Striatal_inh2
+Microglia,Microenv_Striatal_inh2
+Thalamic,Microenv_Thalamic
+Cajal-Retzius cell,Microenv_Thalamic
+Endothelial,Microenv_Thalamic
+Int3,Microenv_Thalamic
+Microglia,Microenv_Thalamic
+VLMC,Microenv_VLMC
+Cajal-Retzius cell,Microenv_VLMC
+Endothelial,Microenv_VLMC
+Migrating neurons,Microenv_VLMC

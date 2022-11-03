@@ -21,7 +21,6 @@ def cal_cell_type_corr_among_spots(spatial_adata, out_path="./coloc_figures/spat
         cmap="YlGnBu",
         linewidths=1,
         linecolor="white",
-        square=True,
         method="ward")
 
     # filter out elements that lower than average of probabilities of cell types (概率小于1/18的元素删除)
@@ -32,7 +31,6 @@ def cal_cell_type_corr_among_spots(spatial_adata, out_path="./coloc_figures/spat
         cmap="YlGnBu",
         linewidths=1,
         linecolor="white",
-        square=True,
         method="ward")
 
     # save figure

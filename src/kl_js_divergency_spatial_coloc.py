@@ -9,6 +9,8 @@ import random
 from itertools import *
 import seaborn as sns
 import networkx as nx
+from scipy.cluster.hierarchy import fclusterdata
+import bootstrap_coloc_parallel as bcp
 
 
 def as_dummy_df(data_input, col_cell_type='tangram_cell_type'):
@@ -79,7 +81,7 @@ def sp_grid_kern_bin(data, coord, min_num=100, h=20, n=100j, tot_num=True):
     coord = pd.DataFrame(coord)
     coord.columns = ['X' + str(i) for i in range(0, len(coord.columns))]
     coord.index = list(data_.index)
-    data_merge = pd.concat([data_, coord], axis=1)
+    data_merge = pd.concat([coord, data_], axis=1)
 
     kde2d = KernelDensity(bandwidth=h, kernel="gaussian")
     # build 2D grid as sample points
@@ -89,7 +91,7 @@ def sp_grid_kern_bin(data, coord, min_num=100, h=20, n=100j, tot_num=True):
     data_out = pd.DataFrame(xy_sample)
     data_out.columns = ["X0", "X1"]
 
-    print("estimate gaussian kernel 2D density for each cell types...")
+    # print("estimate gaussian kernel 2D density for each cell types...")
     for i in data_.columns:
         xy_train = data_merge[["X0", "X1"]][data_merge[i] == 1]
         kde2d.fit(xy_train)
@@ -137,7 +139,7 @@ def KL_JS_Divergence(X, eps=1e-20, diver="KL"):
     diver_matrix = pd.DataFrame(np.zeros((n_type, n_type)))
     diver_matrix.index = X_.columns
     diver_matrix.columns = X_.columns
-    print("calculate cell types pairs " + diver + " divergence...")
+    # print("calculate cell types pairs " + diver + " divergence...")
     if diver == "KL":
         for i in combinations(X_.columns, 2):
             KL = scipy.stats.entropy(X_[i[0]], X_[i[1]])
@@ -153,7 +155,7 @@ def KL_JS_Divergence(X, eps=1e-20, diver="KL"):
     return diver_matrix
 
 
-def KL_JS_boot_mst(dummy_df, coord_df, min_num=15, boot_n=10, prop=0.8, h=20, tot_num=True, diver="JS"):
+def KL_JS_boot_mst_single(dummy_df, coord_df, min_num=15, boot_n=10, prop=0.8, h=20, tot_num=True, diver="JS"):
     """  calculate KL or JS divergence and use MST to generate a tree structure by Bootstrap
          to obtain consensus cell types colocalization dissimilarity matrix
 
@@ -191,15 +193,14 @@ def KL_JS_boot_mst(dummy_df, coord_df, min_num=15, boot_n=10, prop=0.8, h=20, to
     mst_cons = pd.DataFrame(np.zeros((n_type, n_type)), columns=list(dummy_df.columns), index=list(dummy_df.columns))
     dis_cons = pd.DataFrame(np.zeros((n_type, n_type)), columns=list(dummy_df.columns), index=list(dummy_df.columns))
     for i in range(boot_n):
-        print('---- Bootstrap ' + str(i + 1) + " time ----")
+        print('---- Begin Bootstrap ' + str(i + 1) + " time ----")
         random.seed(i)
-        ## Bootstrap ##
+        # Bootstrap
         idx = random.sample(range(n_smp), round(n_smp * prop))
         data_boot = dummy_df.iloc[idx, :]
         coord_boot = coord_df.iloc[idx, :]
         k2d_boot = sp_grid_kern_bin(data=data_boot, coord=coord_boot, min_num=min_num, h=h, tot_num=tot_num)
         dis_boot = KL_JS_Divergence(k2d_boot, eps=1e-20, diver=diver)
-        dis_boot_array[:, :, i] = dis_boot
 
         # create a graph from the adjacency matrix
         graph_boot = nx.from_pandas_adjacency(dis_boot)
@@ -208,14 +209,35 @@ def KL_JS_boot_mst(dummy_df, coord_df, min_num=15, boot_n=10, prop=0.8, h=20, to
         mst_boot = nx.to_pandas_adjacency(graph_mst_boot)
 
         # cumulate bootstrap
+        dis_boot_array[:, :, i] = dis_boot
         mst_cons = mst_cons + mst_boot / boot_n
         dis_cons = dis_cons + dis_boot / boot_n
 
-    print(dis_cons, mst_cons)
     return dis_cons, mst_cons, dis_boot_array
 
 
-def divergence_heatmap(matrix, name="default_divergence", out_path='./'):
+def divergence_cluster(matrix):
+    """ plot divergence clusterd heatmap
+
+    Parameters
+    ---------
+    matrix: dataframe / matrix
+        divergence matrix
+    
+
+    Returns
+    ---------
+    show and save picture;S
+
+    """
+    # precompute linkage matrix
+    matrix_clusters = fclusterdata(matrix, t=1)
+    pd_cluster = pd.DataFrame(matrix_clusters, columns=["cluster"])
+    pd_cluster["cell type"] = matrix.index
+    return pd_cluster.sort_values(axis=0, by=["cluster"])
+
+
+def divergence_clustermap(matrix, name="default_divergence", out_path='./'):
     """ plot divergence clusterd heatmap
 
     Parameters
@@ -227,7 +249,7 @@ def divergence_heatmap(matrix, name="default_divergence", out_path='./'):
 
     Returns
     ---------
-    show and save picture;S
+    show and save picture
 
     """
     matrix_log = -np.log(matrix)
@@ -239,8 +261,8 @@ def divergence_heatmap(matrix, name="default_divergence", out_path='./'):
         cmap="YlOrRd",
         linewidths=1,
         linecolor="white",
-        square=True,
         cbar_pos=[.8, .55, .02, .2],
+        dendrogram_ratio=0.1,
         method="ward")
     # mask upper triangle
     mask = np.triu(np.ones_like(matrix_log))
@@ -256,7 +278,54 @@ def divergence_heatmap(matrix, name="default_divergence", out_path='./'):
     sns_plot.savefig(out_path + name + ".pdf")
 
 
-def draw_graph(df_adjacency, name="graph", node_size=20, edge_width=1, out_path='./'):
+def network_microenv(df_adjacency, out_path, to_cpdb=True, cutoff=0.3):
+    """ obtain cell types microenvironment
+
+        Parameters
+        ---------
+        df_adjacency: dataframe / matrix
+            divergence matrix
+        out_path: string
+            picture name
+        cutoff: number
+            filter out interaction lower than cutoff
+        to_cpdb: bool
+            whether output as CellphoneDB microenvironment file
+
+        Returns
+        ---------
+        output microenvironment file
+
+        """
+    # init
+    microenv = pd.Series(df_adjacency.columns, index=["Microenv_" + str(cell).replace(' ', '_')
+                                                      for cell in df_adjacency.columns])
+    for cell in df_adjacency.columns:
+        index = "Microenv_" + str(cell).replace(' ', '_')
+        # find non-zero element and correspondent cell type
+        non_zero_index = df_adjacency[cell].loc[
+            (df_adjacency[cell] != 0) & (df_adjacency[cell] < cutoff)
+            ].index.values
+        # add interacting cell type
+        if len(non_zero_index) != 0:
+            microenv[index] = np.append(cell, non_zero_index)
+        else:
+            microenv.drop(index, inplace=True)
+    if to_cpdb:
+        out_csv_df = pd.DataFrame(columns=['cell_type', 'microenvironment'])
+        for k, v in microenv.items():
+            v = v.reshape(len(v), 1)
+            k = np.array(str(k)).repeat(len(v)).reshape(len(v), 1)
+            out_csv_df = pd.concat(
+                [out_csv_df, pd.DataFrame(np.hstack([v, k]), columns=['cell_type', 'microenvironment'])],
+                axis=0, ignore_index=True)
+        out_csv_df.to_csv(path_or_buf=out_path + "microenvironment.csv", header=True, index=False, sep=',')
+        return out_csv_df
+    else:
+        return microenv
+
+
+def network_draw(df_adjacency, name="graph", node_size=20, edge_width=1, out_path='./'):
     """ plot network graph
 
     Parameters
@@ -271,7 +340,7 @@ def draw_graph(df_adjacency, name="graph", node_size=20, edge_width=1, out_path=
 
     Returns
     ---------
-    show and save picture;
+    show and save picture
 
     """
     # create
@@ -288,8 +357,7 @@ def draw_graph(df_adjacency, name="graph", node_size=20, edge_width=1, out_path=
     # plot nodes and edges of network graph
     nx.draw_networkx_nodes(G, pos=pos,
                            node_size=[1 * node_size * (item[1] + 1) for item in G.degree()],
-                           label=True,
-                           cmap=plt.cm.Blues)
+                           label=True, node_color="SteelBlue")
     nx.draw_networkx_edges(G, pos=pos,
                            edge_color=[np.log(1 / d["weight"]) for (u, v, d) in G.edges(data=True)],
                            width=[np.log(1 * edge_width / d["weight"]) for (u, v, d) in G.edges(data=True)],
@@ -304,14 +372,14 @@ def draw_graph(df_adjacency, name="graph", node_size=20, edge_width=1, out_path=
 
 def spatial_cell_types_coloc(sp_data_inp, col_cell_type="tangram_cell_type", h=20, boot_n=20, out_path="./"):
     cell_type_dummy_df = as_dummy_df(sp_data_inp.obs, col_cell_type=col_cell_type)
-    dis_cons, mst_cons, dis_boot_array = KL_JS_boot_mst(dummy_df=cell_type_dummy_df,
-                                                        coord_df=sp_data_inp.obsm["spatial"], h=h, boot_n=boot_n)
-    divergence_heatmap(dis_cons, name="cell_types_JSD", out_path=out_path)
-    draw_graph(mst_cons, name="cell_types_mst_network", out_path=out_path)
+    dis_boot_array, dis_cons, mst_cons = bcp.KL_JS_boot_mst(dummy_df=cell_type_dummy_df,
+                                                            coord_df=sp_data_inp.obsm["spatial"], h=h, boot_n=boot_n)
+    divergence_clustermap(dis_cons, name="cell_types_JSD", out_path=out_path)
+    network_microenv(mst_cons, cutoff=0.3, out_path=out_path)
+    network_draw(mst_cons, name="cell_types_mst_network", out_path=out_path)
 
 
 if __name__ == "__main__":
     spatial_adata_annotated = sc.read('data/spatial_adata_annotated.h5ad')
     spatial_cell_types_coloc(sp_data_inp=spatial_adata_annotated, col_cell_type="tangram_cell_type",
-                     h=20, boot_n=5, out_path="coloc_figures/")
-
+                             h=20, boot_n=20, out_path="coloc_figures/")
