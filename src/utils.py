@@ -45,3 +45,7 @@ def read_sc(count, meta, celltype_key='cell_type', batch_key=None, categorical_c
 
 def warn(message):
     sys.stderr.write(message + "\n")
+
+
+def info(message):
+    sys.stdout.write(message + "\n")

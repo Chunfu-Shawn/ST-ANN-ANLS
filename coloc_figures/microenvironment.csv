@@ -1,61 +1,83 @@
 cell_type,microenvironment
-Cajal-Retzius cell,Microenv_Cajal-Retzius_cell
-Endothelial,Microenv_Cajal-Retzius_cell
-Thalamic,Microenv_Cajal-Retzius_cell
-VLMC,Microenv_Cajal-Retzius_cell
-Choroid plexus cell,Microenv_Choroid_plexus_cell
-RG3,Microenv_Choroid_plexus_cell
-Endothelial,Microenv_Endothelial
-Cajal-Retzius cell,Microenv_Endothelial
-Microglia,Microenv_Endothelial
-Thalamic,Microenv_Endothelial
-VLMC,Microenv_Endothelial
-GE progenitors,Microenv_GE_progenitors
-RG2,Microenv_GE_progenitors
-RG3,Microenv_GE_progenitors
-IP,Microenv_IP
-Migrating neurons,Microenv_IP
-RG1,Microenv_IP
-Immature neurons,Microenv_Immature_neurons
-Migrating neurons,Microenv_Immature_neurons
-Int1,Microenv_Int1
-Int2,Microenv_Int1
-Striatal inh1,Microenv_Int1
-Int2,Microenv_Int2
-Int1,Microenv_Int2
-RG3,Microenv_Int2
-Striatal inh2,Microenv_Int2
-Int3,Microenv_Int3
-Thalamic,Microenv_Int3
-Microglia,Microenv_Microglia
-Endothelial,Microenv_Microglia
-Striatal inh2,Microenv_Microglia
-Thalamic,Microenv_Microglia
-Migrating neurons,Microenv_Migrating_neurons
-IP,Microenv_Migrating_neurons
-Immature neurons,Microenv_Migrating_neurons
-VLMC,Microenv_Migrating_neurons
-RG1,Microenv_RG1
-IP,Microenv_RG1
-RG2,Microenv_RG1
-RG2,Microenv_RG2
-GE progenitors,Microenv_RG2
-RG1,Microenv_RG2
-RG3,Microenv_RG3
-Choroid plexus cell,Microenv_RG3
-GE progenitors,Microenv_RG3
-Int2,Microenv_RG3
-Striatal inh1,Microenv_Striatal_inh1
-Int1,Microenv_Striatal_inh1
-Striatal inh2,Microenv_Striatal_inh2
-Int2,Microenv_Striatal_inh2
-Microglia,Microenv_Striatal_inh2
-Thalamic,Microenv_Thalamic
-Cajal-Retzius cell,Microenv_Thalamic
-Endothelial,Microenv_Thalamic
-Int3,Microenv_Thalamic
-Microglia,Microenv_Thalamic
-VLMC,Microenv_VLMC
-Cajal-Retzius cell,Microenv_VLMC
-Endothelial,Microenv_VLMC
-Migrating neurons,Microenv_VLMC
+Choroid plexus [22-E],Microenv_Choroid_plexus_[22-E]
+Ganglionic eminences [6-E],Microenv_Choroid_plexus_[22-E]
+RG4 [10-E],Microenv_Choroid_plexus_[22-E]
+Endothelial [18-E],Microenv_Endothelial_[18-E]
+LayerV-VI [5-E],Microenv_Endothelial_[18-E]
+Microglia [20-E],Microenv_Endothelial_[18-E]
+Ganglionic eminences [6-E],Microenv_Ganglionic_eminences_[6-E]
+Choroid plexus [22-E],Microenv_Ganglionic_eminences_[6-E]
+Int1 [1-E],Microenv_Ganglionic_eminences_[6-E]
+Int1 [1-E],Microenv_Int1_[1-E]
+Ganglionic eminences [6-E],Microenv_Int1_[1-E]
+Striatal inh2 [9-E],Microenv_Int1_[1-E]
+Int2 [12-E],Microenv_Int2_[12-E]
+Striatal inh1 [16-E],Microenv_Int2_[12-E]
+LayerI [17-E],Microenv_LayerI_[17-E]
+Microglia [20-E],Microenv_LayerI_[17-E]
+LayerV-VI [2-E],Microenv_LayerV-VI_[2-E]
+RG4 [10-E],Microenv_LayerV-VI_[2-E]
+SVZ2 (VZ-SVZ) [11-E],Microenv_LayerV-VI_[2-E]
+LayerV-VI [3-E],Microenv_LayerV-VI_[3-E]
+LayerV-VI [13-E],Microenv_LayerV-VI_[3-E]
+LayerV-VI [5-E],Microenv_LayerV-VI_[5-E]
+Endothelial [18-E],Microenv_LayerV-VI_[5-E]
+LayerV-VI [13-E],Microenv_LayerV-VI_[5-E]
+Microglia [20-E],Microenv_LayerV-VI_[5-E]
+SVZ2 (VZ-SVZ) [11-E],Microenv_LayerV-VI_[5-E]
+SVZ3 (proliferating) [15-E],Microenv_LayerV-VI_[5-E]
+LayerV-VI [7-E],Microenv_LayerV-VI_[7-E]
+Striatal inh1 [16-E],Microenv_LayerV-VI_[7-E]
+LayerV-VI [13-E],Microenv_LayerV-VI_[13-E]
+LayerV-VI [3-E],Microenv_LayerV-VI_[13-E]
+LayerV-VI [5-E],Microenv_LayerV-VI_[13-E]
+Microglia [20-E],Microenv_LayerV-VI_[13-E]
+Striatal inh2 [9-E],Microenv_LayerV-VI_[13-E]
+Microglia [20-E],Microenv_Microglia_[20-E]
+Endothelial [18-E],Microenv_Microglia_[20-E]
+LayerI [17-E],Microenv_Microglia_[20-E]
+LayerV-VI [5-E],Microenv_Microglia_[20-E]
+LayerV-VI [13-E],Microenv_Microglia_[20-E]
+RG4 [10-E],Microenv_Microglia_[20-E]
+Striatal inh2 [9-E],Microenv_Microglia_[20-E]
+RG1 [8-E],Microenv_RG1_[8-E]
+RG2 [14-E],Microenv_RG1_[8-E]
+RG2 [14-E],Microenv_RG2_[14-E]
+RG1 [8-E],Microenv_RG2_[14-E]
+SVZ1 (migrating) [4-E],Microenv_RG2_[14-E]
+SVZ3 (proliferating) [15-E],Microenv_RG2_[14-E]
+RG3 (cortical hem) [21-E],Microenv_RG3_(cortical_hem)_[21-E]
+RG4 [10-E],Microenv_RG3_(cortical_hem)_[21-E]
+SVZ2 (VZ-SVZ) [11-E],Microenv_RG3_(cortical_hem)_[21-E]
+Thalamic [19-E],Microenv_RG3_(cortical_hem)_[21-E]
+RG4 [10-E],Microenv_RG4_[10-E]
+Choroid plexus [22-E],Microenv_RG4_[10-E]
+LayerV-VI [2-E],Microenv_RG4_[10-E]
+Microglia [20-E],Microenv_RG4_[10-E]
+RG3 (cortical hem) [21-E],Microenv_RG4_[10-E]
+SVZ2 (VZ-SVZ) [11-E],Microenv_RG4_[10-E]
+SVZ1 (migrating) [4-E],Microenv_SVZ1_(migrating)_[4-E]
+RG2 [14-E],Microenv_SVZ1_(migrating)_[4-E]
+SVZ3 (proliferating) [15-E],Microenv_SVZ1_(migrating)_[4-E]
+SVZ2 (VZ-SVZ) [11-E],Microenv_SVZ2_(VZ-SVZ)_[11-E]
+LayerV-VI [2-E],Microenv_SVZ2_(VZ-SVZ)_[11-E]
+LayerV-VI [5-E],Microenv_SVZ2_(VZ-SVZ)_[11-E]
+RG3 (cortical hem) [21-E],Microenv_SVZ2_(VZ-SVZ)_[11-E]
+RG4 [10-E],Microenv_SVZ2_(VZ-SVZ)_[11-E]
+SVZ3 (proliferating) [15-E],Microenv_SVZ2_(VZ-SVZ)_[11-E]
+SVZ3 (proliferating) [15-E],Microenv_SVZ3_(proliferating)_[15-E]
+LayerV-VI [5-E],Microenv_SVZ3_(proliferating)_[15-E]
+RG2 [14-E],Microenv_SVZ3_(proliferating)_[15-E]
+SVZ1 (migrating) [4-E],Microenv_SVZ3_(proliferating)_[15-E]
+SVZ2 (VZ-SVZ) [11-E],Microenv_SVZ3_(proliferating)_[15-E]
+Striatal inh1 [16-E],Microenv_Striatal_inh1_[16-E]
+Int2 [12-E],Microenv_Striatal_inh1_[16-E]
+LayerV-VI [7-E],Microenv_Striatal_inh1_[16-E]
+Striatal inh2 [9-E],Microenv_Striatal_inh1_[16-E]
+Striatal inh2 [9-E],Microenv_Striatal_inh2_[9-E]
+Int1 [1-E],Microenv_Striatal_inh2_[9-E]
+LayerV-VI [13-E],Microenv_Striatal_inh2_[9-E]
+Microglia [20-E],Microenv_Striatal_inh2_[9-E]
+Striatal inh1 [16-E],Microenv_Striatal_inh2_[9-E]
+Thalamic [19-E],Microenv_Thalamic_[19-E]
+RG3 (cortical hem) [21-E],Microenv_Thalamic_[19-E]

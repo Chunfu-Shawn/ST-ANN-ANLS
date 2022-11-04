@@ -4,6 +4,7 @@ import random
 import networkx as nx
 from multiprocessing import Pool, Manager
 from kl_js_divergency_spatial_coloc import sp_grid_kern_bin, KL_JS_Divergence
+import utils
 
 
 def KL_JS_boot_mst(dummy_df, coord_df, min_num=15, boot_n=10, prop=0.8, h=20, tot_num=True, diver="JS"):
@@ -37,7 +38,8 @@ def KL_JS_boot_mst(dummy_df, coord_df, min_num=15, boot_n=10, prop=0.8, h=20, to
         Each Bootstrap result
 
     """
-
+    utils.info('---- Begin Predicting Spatially Co-localized Cell Types by Bootstrap ----')
+    utils.info('---- Methods: ' + diver + ', MST ----')
     n_smp = len(dummy_df)
     n_type = len(dummy_df.columns)
     # Process Pool for maximum 3 processes

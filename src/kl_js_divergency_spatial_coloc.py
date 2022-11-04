@@ -13,12 +13,12 @@ from scipy.cluster.hierarchy import fclusterdata
 import bootstrap_coloc_parallel as bcp
 
 
-def as_dummy_df(data_input, col_cell_type='tangram_cell_type'):
+def as_dummy_df(data_input, col_cell_type='cell_type'):
     """Transform cell type long dataframe to wider table with original cell index
     Parameters:
     ------------
     data_input: dataframe
-        Includes default column "tangram_cell_type" and index "cell id"
+        Includes default column "cell_type" and index "cell id"
     col_cell_type: string
         Column name of cell type,  cell type names must be syntactically valid
 
@@ -370,7 +370,7 @@ def network_draw(df_adjacency, name="graph", node_size=20, edge_width=1, out_pat
     plt.show()
 
 
-def spatial_cell_types_coloc(sp_data_inp, col_cell_type="tangram_cell_type", h=20, boot_n=20, out_path="./"):
+def spatial_cell_types_coloc(sp_data_inp, col_cell_type="cell_type", h=20, boot_n=20, out_path="./"):
     cell_type_dummy_df = as_dummy_df(sp_data_inp.obs, col_cell_type=col_cell_type)
     dis_boot_array, dis_cons, mst_cons = bcp.KL_JS_boot_mst(dummy_df=cell_type_dummy_df,
                                                             coord_df=sp_data_inp.obsm["spatial"], h=h, boot_n=boot_n)
@@ -380,6 +380,6 @@ def spatial_cell_types_coloc(sp_data_inp, col_cell_type="tangram_cell_type", h=2
 
 
 if __name__ == "__main__":
-    spatial_adata_annotated = sc.read('data/spatial_adata_annotated.h5ad')
-    spatial_cell_types_coloc(sp_data_inp=spatial_adata_annotated, col_cell_type="tangram_cell_type",
-                             h=20, boot_n=20, out_path="coloc_figures/")
+    spatial_adata_annotated = sc.read('data/STW-M-Brain-Stereo-seq-1/coronal_1.bin50.adata_sp_ann.clusters.h5ad')
+    spatial_cell_types_coloc(sp_data_inp=spatial_adata_annotated, col_cell_type="cell_type",
+                             h=20, boot_n=20, out_path="data/STW-M-Brain-Stereo-seq-1/out/")
