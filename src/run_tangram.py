@@ -81,7 +81,8 @@ class PerformTangram:
 
     def save(self):
         utils.info("Save tangram results")
-        self.adata_sc.write(self.output_dir + 'adata_sc.' + self.mode + '.h5ad')
+        print(adata_sc.var.index.values[2000])
+        # self.adata_sc.write(self.output_dir + 'adata_sc.' + self.mode + '.h5ad')
         if self.adata_map:
             self.adata_map.write(self.output_dir + 'adata_map.' + self.mode + '.h5ad')
         if self.adata_sp_ann:
@@ -109,5 +110,4 @@ if __name__ == "__main__":
                             cell_type_key='cell_type')
     tg_ins.run_tangram(gpu_index=1)
     tg_ins.project_cell_annotations()
-    print(tg_ins.return_adata_sp_ann())
     tg_ins.save()

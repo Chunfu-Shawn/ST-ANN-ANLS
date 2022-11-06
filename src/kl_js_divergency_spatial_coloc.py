@@ -278,7 +278,7 @@ def divergence_clustermap(matrix, name="default_divergence", out_path='./'):
     sns_plot.savefig(out_path + name + ".pdf")
 
 
-def network_microenv(df_adjacency, out_path, to_cpdb=True, cutoff=0.3):
+def network_microenv(df_adjacency, out_path, to_cpdb=True, cutoff=0.5):
     """ obtain cell types microenvironment
 
         Parameters
@@ -287,8 +287,8 @@ def network_microenv(df_adjacency, out_path, to_cpdb=True, cutoff=0.3):
             divergence matrix
         out_path: string
             picture name
-        cutoff: number
-            filter out interaction lower than cutoff
+        cutoff: 0-1
+            filter out divergence lower than cutoff percentile
         to_cpdb: bool
             whether output as CellphoneDB microenvironment file
 
@@ -300,17 +300,27 @@ def network_microenv(df_adjacency, out_path, to_cpdb=True, cutoff=0.3):
     # init
     microenv = pd.Series(df_adjacency.columns, index=["Microenv_" + str(cell).replace(' ', '_')
                                                       for cell in df_adjacency.columns])
+    # assign top "cutoff" percent divergence value to cutoff value
+    arr_adjacency = np.array(df_adjacency).ravel()
+    arr_adjacency_nonzero = []
+    for i in arr_adjacency:
+        if i != 0:
+            arr_adjacency_nonzero = np.append(arr_adjacency_nonzero, [i])
+    cutoff_v = np.percentile(np.sort(arr_adjacency_nonzero), cutoff*100)
+
+    # find microenvironment from consensus mst
     for cell in df_adjacency.columns:
         index = "Microenv_" + str(cell).replace(' ', '_')
         # find non-zero element and correspondent cell type
         non_zero_index = df_adjacency[cell].loc[
-            (df_adjacency[cell] != 0) & (df_adjacency[cell] < cutoff)
+            (df_adjacency[cell] != 0) & (df_adjacency[cell] < cutoff_v)
             ].index.values
         # add interacting cell type
         if len(non_zero_index) != 0:
             microenv[index] = np.append(cell, non_zero_index)
         else:
             microenv.drop(index, inplace=True)
+
     if to_cpdb:
         out_csv_df = pd.DataFrame(columns=['cell_type', 'microenvironment'])
         for k, v in microenv.items():
@@ -370,16 +380,16 @@ def network_draw(df_adjacency, name="graph", node_size=20, edge_width=1, out_pat
     plt.show()
 
 
-def spatial_cell_types_coloc(sp_data_inp, col_cell_type="cell_type", h=20, boot_n=20, out_path="./"):
+def spatial_cell_types_coloc(sp_data_inp, cutoff, col_cell_type="cell_type", h=20, boot_n=20, out_path="./"):
     cell_type_dummy_df = as_dummy_df(sp_data_inp.obs, col_cell_type=col_cell_type)
     dis_boot_array, dis_cons, mst_cons = bcp.KL_JS_boot_mst(dummy_df=cell_type_dummy_df,
                                                             coord_df=sp_data_inp.obsm["spatial"], h=h, boot_n=boot_n)
     divergence_clustermap(dis_cons, name="cell_types_JSD", out_path=out_path)
-    network_microenv(mst_cons, cutoff=0.3, out_path=out_path)
+    network_microenv(mst_cons, cutoff=cutoff, out_path=out_path)
     network_draw(mst_cons, name="cell_types_mst_network", out_path=out_path)
 
 
 if __name__ == "__main__":
     spatial_adata_annotated = sc.read('data/STW-M-Brain-Stereo-seq-1/coronal_1.bin50.adata_sp_ann.clusters.h5ad')
     spatial_cell_types_coloc(sp_data_inp=spatial_adata_annotated, col_cell_type="cell_type",
-                             h=20, boot_n=20, out_path="data/STW-M-Brain-Stereo-seq-1/out/")
+                             h=20, out_path="data/STW-M-Brain-Stereo-seq-1/out/", cutoff=0.5)
