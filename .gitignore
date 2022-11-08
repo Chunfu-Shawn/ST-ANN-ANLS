@@ -8,5 +8,6 @@ jupyter/
 .idea/
 
 #figure
-figures/
-Cell type gaussian kernel density/
+tmp/figures/
+tmp/Cell type gaussian kernel density/
+tmp/
