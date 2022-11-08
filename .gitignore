@@ -6,3 +6,7 @@ jupyter/
 
 # pycharm
 .idea/
+
+#figure
+figures/
+Cell type gaussian kernel density/
