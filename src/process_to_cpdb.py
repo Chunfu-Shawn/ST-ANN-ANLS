@@ -1,8 +1,8 @@
+import gene_orthologues_trans as got
+import utils
 import numpy as np
 import pandas as pd
 import scanpy as sc
-import gene_orthologues_trans as got
-import utils
 
 
 def process_to_cpdb(sc_data, save_path, name="test", annotation_name="cell_type"):
