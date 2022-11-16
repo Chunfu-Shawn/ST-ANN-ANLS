@@ -49,7 +49,7 @@ dotplot = function(data_ip,output_path,output_name){
     geom_point(aes(size=pvalue,colour=means)) +
     scale_size_continuous(name = TeX('$-log_{10}$ p-value'), range = c(0.1,2))+ 
     scale_colour_gradientn(colours = viridis(100,option = "magma"),
-                          values = c(seq(0,0.3,length.out = 70),seq(0.3,1,length.out = 30)),
+                          values = c(seq(0,0.3,length.out = 50),seq(0.3,1,length.out = 50)),
                           name = TeX('$log_{2}$ mean expr (molecule 1,molecule 2)')) +
     xlab('')+ylab('')+
     theme(panel.background = element_blank(),
@@ -59,7 +59,7 @@ dotplot = function(data_ip,output_path,output_name){
           legend.key = element_blank(),
           legend.position = "bottom",
           plot.title = element_text(hjust = 0.5))
-  ggsave(paste(output_path,output_name,'.pdf',sep = ''), device = 'pdf', width = width, height = height)
+  ggsave(paste(output_path,'pdf/',output_name,'.pdf',sep = ''), device = 'pdf', width = width, height = height)
 }
 ```
 
@@ -78,9 +78,14 @@ cells_interaction_heatmap = function(
     count_mat[cell_type[1],cell_type[2]] = count_mat[cell_type[1],cell_type[2]] +1
     count_mat[cell_type[2],cell_type[1]] = count_mat[cell_type[2],cell_type[1]] +1
   }
-  pdf(file = paste(output_path,output_name,'.pdf',sep = ''))
+  count_array = c(count_mat[lower.tri(count_mat)])
+  print(count_array) 
+  # rescale color
+  col_func = circlize::colorRamp2(quantile(count_array, probs = c(seq(0,0.7,length.out=30),seq(0.7,1,length.out=70))), viridis(100,option = "B"))
+  # draw
+  pdf(file = paste(output_path,'pdf/',output_name,'.pdf',sep = ''))
   hm = Heatmap(count_mat, name = 'Number of interaction',
-              col = viridis(20,option = "B"),
+              col = col_func,
               heatmap_legend_param = list(
                 direction = "horizontal"
               ),

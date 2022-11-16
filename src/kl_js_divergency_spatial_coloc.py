@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import sys
 import scanpy as sc
 import pandas as pd
@@ -7,9 +6,8 @@ from sklearn.neighbors import KernelDensity
 import scipy.stats
 import random
 from itertools import *
-import seaborn as sns
 import networkx as nx
-from scipy.cluster.hierarchy import fclusterdata
+from coloc_cluster_draw import *
 import bootstrap_coloc_parallel as bcp
 
 
@@ -216,68 +214,6 @@ def KL_JS_boot_mst_single(dummy_df, coord_df, min_num=15, boot_n=10, prop=0.8, h
     return dis_cons, mst_cons, dis_boot_array
 
 
-def divergence_cluster(matrix):
-    """ plot divergence clusterd heatmap
-
-    Parameters
-    ---------
-    matrix: dataframe / matrix
-        divergence matrix
-    
-
-    Returns
-    ---------
-    show and save picture;S
-
-    """
-    # precompute linkage matrix
-    matrix_clusters = fclusterdata(matrix, t=1)
-    pd_cluster = pd.DataFrame(matrix_clusters, columns=["cluster"])
-    pd_cluster["cell type"] = matrix.index
-    return pd_cluster.sort_values(axis=0, by=["cluster"])
-
-
-def divergence_clustermap(matrix, name="default_divergence", out_path='./'):
-    """ plot divergence clusterd heatmap
-
-    Parameters
-    ---------
-    matrix: dataframe / matrix
-        divergence matrix
-    name: string
-        picture name
-
-    Returns
-    ---------
-    show and save picture
-
-    """
-    matrix_log = -np.log(matrix)
-    # transfre -log0 (infinite) to the max value of column
-    matrix_log = matrix_log.replace(np.inf, np.nan)
-    matrix_log = matrix_log.replace(np.nan, matrix_log.max())
-    sns_plot = sns.clustermap(
-        matrix_log,
-        cmap="YlOrRd",
-        linewidths=1,
-        linecolor="white",
-        cbar_pos=[.8, .55, .02, .2],
-        dendrogram_ratio=0.1,
-        method="ward")
-    # mask upper triangle
-    mask = np.triu(np.ones_like(matrix_log))
-    values = sns_plot.ax_heatmap.collections[0].get_array().reshape(matrix_log.shape)
-    new_values = np.ma.array(values, mask=mask)
-    sns_plot.ax_heatmap.collections[0].set_array(new_values)
-    # set left dendrogram invisible
-    sns_plot.ax_row_dendrogram.set_visible(False)
-    # set y axis ticks left
-    sns_plot.ax_heatmap.yaxis.set_ticks_position("left")
-    plt.show()
-    # save figure
-    sns_plot.savefig(out_path + name + ".pdf")
-
-
 def network_microenv(df_adjacency, out_path, to_cpdb=True, cutoff=0.5):
     """ obtain cell types microenvironment
 
@@ -335,57 +271,12 @@ def network_microenv(df_adjacency, out_path, to_cpdb=True, cutoff=0.5):
         return microenv
 
 
-def network_draw(df_adjacency, name="graph", node_size=20, edge_width=1, out_path='./'):
-    """ plot network graph
-
-    Parameters
-    ---------
-    df_adjacency: dataframe / matrix
-        adjacency matrix
-    name: string
-        picture name
-    node_size: control node size
-    edge_width: control edge width
-    out_path: output pathway
-
-    Returns
-    ---------
-    show and save picture
-
-    """
-    # create
-    G = nx.from_pandas_adjacency(df_adjacency)
-    # define position of nodes and labels
-    pos = nx.planar_layout(G)
-    labels_pos = {}
-    for key, value in pos.items():
-        random.seed(value[0])
-        labels_pos[key] = (value[0], value[1])
-
-    plt.figure(figsize=(6, 6))
-    plt.axis('off')
-    # plot nodes and edges of network graph
-    nx.draw_networkx_nodes(G, pos=pos,
-                           node_size=[1 * node_size * (item[1] + 1) for item in G.degree()],
-                           label=True, node_color="SteelBlue")
-    nx.draw_networkx_edges(G, pos=pos,
-                           edge_color=[np.log(1 / d["weight"]) for (u, v, d) in G.edges(data=True)],
-                           width=[np.log(1 * edge_width / d["weight"]) for (u, v, d) in G.edges(data=True)],
-                           edge_cmap=plt.cm.Blues)
-    nx.draw_networkx_labels(G, pos=labels_pos, font_size=6, font_weight="bold")
-    # plt.show(block=False)
-
-    # save figure
-    plt.savefig(out_path + name + '.pdf', pad_inches=0.1)
-    plt.show()
-
-
 def spatial_cell_types_coloc(sp_data_inp, cutoff, col_cell_type="cell_type", h=20, boot_n=20, out_path="./"):
     cell_type_dummy_df = as_dummy_df(sp_data_inp.obs, col_cell_type=col_cell_type)
     dis_boot_array, dis_cons, mst_cons = bcp.KL_JS_boot_mst(dummy_df=cell_type_dummy_df,
                                                             coord_df=sp_data_inp.obsm["spatial"], h=h, boot_n=boot_n)
+    network_microenv(mst_cons, cutoff=cutoff, out_path=out_path + "table/")
     divergence_clustermap(dis_cons, name="cell_types_JSD", out_path=out_path)
-    network_microenv(mst_cons, cutoff=cutoff, out_path=out_path)
     network_draw(mst_cons, name="cell_types_mst_network", out_path=out_path)
 
 

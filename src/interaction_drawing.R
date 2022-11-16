@@ -9,6 +9,8 @@ suppressPackageStartupMessages(library(viridis))
 library(latex2exp)
 suppressPackageStartupMessages(library(ComplexHeatmap))
 library(optparse)
+library(rjson)
+suppressPackageStartupMessages(library(jsonlite))
 
 
 # select cell pairs from microenvironment
@@ -43,7 +45,7 @@ dotplot = function(data_ip,output_path,output_name){
   ggplot(data=data_ip, aes(x=interacting_pair,y=cell_pairs)) +
     geom_point(aes(size=pvalue,colour=means)) +
     scale_size_continuous(name = TeX('$-log_{10}$ p-value'), range = c(0.1,2))+ 
-    scale_colour_gradientn(colours = viridis(100,option = "magma"),
+    scale_colour_gradientn(colours = viridis(100,option = "D"),
                            values = c(seq(0,0.3,length.out = 70),seq(0.3,1,length.out = 30)),
                            name = TeX('$log_{2}$ mean expr (molecule 1,molecule 2)')) +
     xlab('')+ylab('')+
@@ -54,7 +56,7 @@ dotplot = function(data_ip,output_path,output_name){
           legend.key = element_blank(),
           legend.position = "bottom",
           plot.title = element_text(hjust = 0.5))
-  ggsave(paste(output_path,'/', output_name,'.pdf',sep = ''), device = 'pdf', width = width, height = height)
+  ggsave(paste(output_path,'/pdf/', output_name,'.pdf',sep = ''), device = 'pdf', width = width, height = height)
 }
 
 
@@ -62,13 +64,8 @@ dotplot = function(data_ip,output_path,output_name){
 cells_interaction_heatmap = function(
     data_ip,microenvs_path,output_path,output_name="inter_count_heatmap"){
   
-  microenvs_data = read_csv(microenvs_path,col_names = T, show_col_types = F)
+  microenvs_data = read_csv(microenvs_path,col_names = T,show_col_types = FALSE)
   cell_types = unique(microenvs_data[["cell_type"]])
-  # generate adjusted parameters
-  len = length(cell_types)
-  wid_heig = 0.5*len + 4
-  fontsize = -0.2*len + 10
-  # generate matrix
   count_mat = matrix(data = 0,nrow = length(cell_types),ncol = length(cell_types))
   rownames(count_mat) = cell_types
   colnames(count_mat) = cell_types
@@ -77,18 +74,38 @@ cells_interaction_heatmap = function(
     count_mat[cell_type[1],cell_type[2]] = count_mat[cell_type[1],cell_type[2]] +1
     count_mat[cell_type[2],cell_type[1]] = count_mat[cell_type[2],cell_type[1]] +1
   }
-  #draw
-  pdf(file = paste(output_path,'/',output_name,'.pdf',sep = ''))
+  
+  # rescale color
+  count_array = c(count_mat[lower.tri(count_mat)])
+  col_func = circlize::colorRamp2(quantile(count_array, probs = c(seq(0,0.7,length.out=30),seq(0.7,1,length.out=70))), viridis(100,option = "D"))
+  # draw
+  pdf(file = paste(output_path,'/pdf/',output_name,'.pdf',sep = ''))
   hm = Heatmap(count_mat, name = 'Number of interaction',
-               col = viridis(20,option = "B"),
+               col = col_func,
                heatmap_legend_param = list(
                  direction = "horizontal"
                ),
-               row_names_gp = gpar(fontsize=fontsize),
-               column_names_gp = gpar(fontsize=fontsize),
-               heatmap_width = unit(len,"cm"), heatmap_height = unit(len,"cm"))
+               row_names_gp = gpar(fontsize=8),
+               column_names_gp = gpar(fontsize=8),
+               width = unit(10,"cm"), height = unit(10,"cm"))
   draw(hm , heatmap_legend_side="bottom")
   dev.off()
+  
+  # cluster
+  hc = hclust(dist(count_mat),"ward.D")
+  
+  # save as json
+  count_mat = count_mat[hc$order,hc$order]
+  rownames(count_mat) = NULL
+  colnames(count_mat) = NULL
+  count_df = expand_grid(x=seq_len(nrow(count_mat)),y=seq_len(ncol(count_mat))) %>%
+    rowwise() %>%
+    mutate(count=count_mat[x,y])
+  count = apply(count_df, 1, function(x){
+    c(as.integer(x["x"])-1,as.integer(x["y"])-1,as.integer(x["count"]))
+  },simplify = F)
+  out_json =toJSON(list(cell_types=hc$labels[hc$order],count=count),pretty=F,auto_unbox=T)
+  cat(out_json, file = paste(output_path,'/table/',output_name,'.json',sep = ''))
 }
 
 
@@ -132,7 +149,7 @@ interaction_plot =
                                 microenvs_path=microenvs_path,
                                 output_path=output_path)
       microenvs_cell_pairs = select_cell_pairs_from_microenv(
-        microenvs_path="/home/user/data2/rbase/spatial_annotate_scripts/data/STW-M-Brain-Stereo-seq-1/out/microenvironment.csv"
+        microenvs_path=microenvs_path
       )
       ## for each environment
       print(" --- Drawing dotplot for each environment... --- ")
@@ -158,7 +175,7 @@ work_dir = gsub("/$","",work_dir)
 # set paramters
 means_path = paste(work_dir,"/means.txt",sep = "")
 pvalues_path = paste(work_dir,"/pvalues.txt",sep = "")
-microenvs_path = paste(work_dir,"/microenvironment.csv",sep = "")
+microenvs_path = paste(work_dir,"/table/microenvironment.csv",sep = "")
 
 # main 
 interaction_plot(
